@@ -1,0 +1,1523 @@
+below are steps whoch are impelmnted in this project just follow
+
+📌 React + Full-Stack Interview Questions & Answers (5 YOE Level)
+🔹 React Core & Advanced
+
+Q1. Explain the difference between controlled and uncontrolled components in React.
+✅ Answer:
+
+Controlled components: Form data is managed by React state (useState / Redux). Example: <input value={state} onChange={setState}>.
+
+Uncontrolled components: Form data managed by the DOM via ref. Example: <input ref={ref}>.
+
+Controlled gives better validation & data flow control; uncontrolled may be faster for simple forms.
+
+Q2. How would you handle state management in a large React application?
+✅ Answer:
+
+Small state → useState, useReducer
+
+Global app state → Redux Toolkit / Zustand / Jotai
+
+Server state → React Query (for caching, fetching, mutations)
+
+GraphQL → Apollo Client (cache normalization + SSR)
+
+Scenario: If you have user authentication state + live chat updates + paginated data, I’d use:
+
+Redux Toolkit for user/auth
+
+React Query for async APIs (chat, feed)
+
+WebSockets for real-time
+
+Q3. How does React’s reconciliation algorithm (diffing) work?
+✅ Answer:
+
+React compares the virtual DOM tree with the previous render (diffing).
+
+Uses keys to optimize list rendering.
+
+If component type changes → React destroys & re-creates.
+
+For performance, use memo, useMemo, useCallback to avoid unnecessary re-renders.
+
+Q4. What is the difference between SSR, SSG, and CSR in React apps?
+✅ Answer:
+
+CSR (Client-Side Rendering): Default React. HTML loads first, JS hydrates. (Slower SEO, fast navigation).
+
+SSR (Server-Side Rendering): Render HTML on server, faster first paint + SEO. Used in Next.js.
+
+SSG (Static Site Generation): Pre-build HTML at build time (e.g., blogs).
+
+Scenario: If building an e-commerce site with dynamic stock updates:
+
+Product details = SSR (SEO needed)
+
+Dashboard = CSR (auth heavy, no SEO needed)
+
+Static pages (About/Help) = SSG
+
+Q5. How would you optimize performance in a React app?
+✅ Answer:
+
+Code splitting with React.lazy + Suspense
+
+Memoization (useMemo, useCallback, React.memo)
+
+Windowing large lists (react-virtualized / react-virtuoso)
+
+Avoid unnecessary state at the top-level (lift only when needed)
+
+Debounce/throttle input handlers
+
+Lazy load images (Intersection Observer)
+
+🔹 Full-Stack + React Scenarios
+
+Q6. You need to implement authentication in a React app with Node.js backend. How would you design it?
+✅ Answer (Scenario):
+
+Backend (Node + Express):
+
+Login API → validate credentials, return JWT access + refresh token.
+
+Middleware to verify JWT for protected routes.
+
+Refresh token endpoint.
+
+Frontend (React):
+
+Store JWT in HttpOnly cookie (secure).
+
+React Context / Redux to hold auth state.
+
+Axios interceptors to auto-refresh token if expired.
+
+Q7. A dashboard needs real-time updates when a new order is placed. How would you build it?
+✅ Answer:
+
+Use WebSockets (Socket.IO) or Server-Sent Events (SSE).
+
+Backend pushes events → React listens with useEffect.
+
+Example:
+
+useEffect(() => {
+  socket.on("newOrder", (order) => setOrders(prev => [...prev, order]));
+}, []);
+
+
+If scaling, use Redis pub/sub or Kafka for event broadcasting.
+
+Q8. You have a React app calling multiple APIs. One API fails. How do you ensure UX doesn’t break?
+✅ Answer:
+
+Use Promise.allSettled instead of Promise.all (so one failure won’t break all).
+
+Show partial UI with fallback.
+
+Retry failed requests with exponential backoff.
+
+Log errors to monitoring (Sentry / Datadog).
+
+Q9. How would you implement file uploads (large files) in React + Node?
+✅ Answer:
+
+Frontend: Use FormData, axios.post, or chunk uploads.
+
+Backend: Multer (Express) / Busboy for handling uploads.
+
+For large files: Split into chunks, upload sequentially, track progress.
+
+Store in S3/Blob storage, generate signed URLs for secure download.
+
+Q10. You need to build a React app that consumes a GraphQL API. How do you do it?
+✅ Answer:
+
+Install Apollo Client → configure with backend endpoint.
+
+Use useQuery / useMutation hooks.
+
+Normalize caching for list updates.
+
+Example:
+
+const { data, loading, error } = useQuery(GET_POSTS);
+
+🔹 Practical Coding Tasks
+
+Task 1 (React Frontend):
+Build a todo list app with these requirements:
+
+Add/edit/delete tasks
+
+Persist in backend (Node.js + Mongo/Postgres)
+
+Filter: all / completed / pending
+
+Show real-time updates (WebSockets) when multiple users add tasks
+
+Task 2 (Full-Stack API):
+Design a user profile management system:
+
+API endpoints:
+
+POST /api/users → Create user
+
+GET /api/users/:id → Get user
+
+PUT /api/users/:id → Update user
+
+React frontend to call APIs
+
+Add validation + error handling
+
+Task 3 (Scenario):
+You are asked to debug performance issues in a React app where the UI freezes when loading 10,000 records.
+
+Solution:
+
+Use virtualized lists (react-window)
+
+Paginate backend results
+
+Memoize expensive components
+
+Task 4 (System Design + React):
+Design a mini e-commerce app:
+
+React frontend with product catalog + cart
+
+Node.js + Express backend
+
+MongoDB / PostgreSQL database
+
+Payment gateway integration (Stripe)
+
+Role-based authentication (admin vs user)
+
+⚡ Would you like me to also create a mock interview script (where I play the interviewer asking you scenario-based questions and you attempt answers), so you can practice like a real interview?
+
+You said:
+React + Full-Stack Interview Questions & Answers (5 YOE Level)
+🔹 React Core & Advanced  each adn every question share the practials examepls  i am very intersted 
+ChatGPT said:
+
+Perfect 🚀 You want React + Full-Stack interview questions with deep practical examples (hands-on code, scenarios, and explanations). Since you have 5 years of experience, I’ll go beyond theory and show real-world code snippets + system design patterns for each question.
+
+Let’s start with React Core & Advanced (Q1–Q5), each with practical examples.
+
+🔹 React Core & Advanced (with Practical Examples)
+Q1. Controlled vs Uncontrolled Components
+
+👉 Interview Question: Explain the difference between controlled and uncontrolled components.
+
+✅ Answer + Example:
+Controlled → React manages the state.
+Uncontrolled → DOM manages the state (using ref).
+
+Example: Controlled Input
+import { useState } from "react";
+
+export default function ControlledForm() {
+  const [name, setName] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert(`Controlled value: ${name}`);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input 
+        value={name} 
+        onChange={(e) => setName(e.target.value)} 
+        placeholder="Enter your name" 
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+Example: Uncontrolled Input
+import { useRef } from "react";
+
+export default function UncontrolledForm() {
+  const nameRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert(`Uncontrolled value: ${nameRef.current?.value}`);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input ref={nameRef} placeholder="Enter your name" />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+
+👉 When to use?
+
+Controlled: Validation-heavy forms, dynamic changes.
+
+Uncontrolled: Simple, high-performance, quick forms.
+
+Q2. State Management in Large React Apps
+
+👉 Interview Question: How do you handle state in large-scale applications?
+
+✅ Answer + Example:
+
+Local UI state → useState / useReducer
+
+Global state → Redux Toolkit / Zustand
+
+Async server state → React Query / Apollo
+
+Example: Combining Local + Global + Server State
+// userSlice.ts (Redux Toolkit)
+import { createSlice } from "@reduxjs/toolkit";
+
+const userSlice = createSlice({
+  name: "user",
+  initialState: { user: null },
+  reducers: {
+    loginSuccess: (state, action) => { state.user = action.payload; },
+    logout: (state) => { state.user = null; }
+  }
+});
+
+export const { loginSuccess, logout } = userSlice.actions;
+export default userSlice.reducer;
+
+// React Query - fetching posts
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+const fetchPosts = async () => {
+  const { data } = await axios.get("/api/posts");
+  return data;
+};
+
+export default function Posts() {
+  const { data, error, isLoading } = useQuery(["posts"], fetchPosts);
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading posts</p>;
+
+  return (
+    <ul>
+      {data.map((post: any) => <li key={post.id}>{post.title}</li>)}
+    </ul>
+  );
+}
+
+
+👉 Scenario Use Case:
+
+Auth state (Redux)
+
+Posts feed (React Query)
+
+Local form (useState)
+
+Q3. React Reconciliation (Diffing)
+
+👉 Interview Question: How does React decide what to re-render?
+
+✅ Answer:
+
+React creates a virtual DOM and compares with the previous tree.
+
+Uses keys in lists to detect changes.
+
+If a component’s props/state didn’t change → React reuses it.
+
+Example: Keys in List Rendering
+export default function TodoList({ todos }: { todos: {id: number, task: string}[] }) {
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id}>{todo.task}</li> // key is critical here
+      ))}
+    </ul>
+  );
+}
+
+
+❌ Wrong (re-render issues):
+
+{todos.map((todo, i) => <li key={i}>{todo.task}</li>)}
+
+
+👉 Why wrong?
+If you delete a todo, React reuses DOM nodes incorrectly → UI bugs.
+
+Performance Example with memo
+import React, { memo } from "react";
+
+const ExpensiveComponent = memo(({ value }: { value: number }) => {
+  console.log("Rendered expensive component");
+  return <p>Value: {value}</p>;
+});
+
+export default function Parent() {
+  const [count, setCount] = React.useState(0);
+
+  return (
+    <div>
+      <button onClick={() => setCount(c => c+1)}>Increment</button>
+      <ExpensiveComponent value={42} />
+    </div>
+  );
+}
+
+
+👉 Result: ExpensiveComponent won’t re-render when count changes.
+
+Q4. SSR, CSR, SSG
+
+👉 Interview Question: Explain CSR, SSR, SSG with practical React use cases.
+
+✅ Answer:
+
+Example: CSR (default React)
+// index.tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+root.render(<App />);
+
+
+👉 SEO suffers because HTML is empty until JS loads.
+
+Example: SSR (Express + React)
+import express from "express";
+import ReactDOMServer from "react-dom/server";
+import App from "./App";
+
+const app = express();
+
+app.get("*", (req, res) => {
+  const html = ReactDOMServer.renderToString(<App />);
+  res.send(`<!DOCTYPE html><div id="root">${html}</div>`);
+});
+
+app.listen(3000);
+
+
+👉 Better SEO & faster TTFB.
+
+Example: SSG (Next.js getStaticProps)
+export async function getStaticProps() {
+  const res = await fetch("https://api.example.com/posts");
+  const posts = await res.json();
+  return { props: { posts } };
+}
+
+
+👉 Great for blogs/docs with infrequent updates.
+
+Q5. Performance Optimization
+
+👉 Interview Question: How would you optimize a React app with slow performance?
+
+✅ Answer + Example:
+
+Example: Code Splitting
+import React, { Suspense, lazy } from "react";
+
+const Dashboard = lazy(() => import("./Dashboard"));
+
+export default function App() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <Dashboard />
+    </Suspense>
+  );
+}
+
+Example: List Virtualization
+import { Virtuoso } from "react-virtuoso";
+
+export default function LargeList({ items }: { items: string[] }) {
+  return (
+    <Virtuoso
+      style={{ height: 400 }}
+      totalCount={items.length}
+      itemContent={(index) => <div>{items[index]}</div>}
+    />
+  );
+}
+
+Example: Debounce expensive handler
+import { useState } from "react";
+import { debounce } from "lodash";
+
+export default function Search() {
+  const [query, setQuery] = useState("");
+
+  const handleChange = debounce((val: string) => {
+    console.log("API Call:", val);
+  }, 500);
+
+  return (
+    <input
+      onChange={(e) => {
+        setQuery(e.target.value);
+        handleChange(e.target.value);
+      }}
+    />
+  );
+}
+
+
+👉 Result: Avoids unnecessary API calls.
+
+✅ That covers React Core + Advanced (Q1–Q5) with practical examples.
+Next, I can go into Full-Stack + React Scenarios (Q6–Q10) with backend + frontend code snippets (authentication, real-time updates, GraphQL, file uploads, etc.).
+
+Do you want me to continue with Q6–Q10 Full-Stack practical examples now?
+
+You said:
+I want scenarion with 100 questions like Q1-Q100 share me at one with all scenation small to very Deep task as you given above
+ChatGPT said:
+
+🔥 Got it! You want a huge collection (100 questions) of React + Full-Stack interview questions ranging from basic → deep system design tasks, with scenario-based practical examples (like I did for Q1–Q5).
+
+This is a big deliverable, so here’s how I’ll structure it:
+
+Section 1: React Core (Q1–Q20) – JSX, components, props, state, hooks.
+
+Section 2: React Advanced (Q21–Q40) – Context, Redux, React Query, performance, suspense, SSR.
+
+Section 3: Full-Stack Integration (Q41–Q60) – API calls, authentication, file uploads, GraphQL, caching.
+
+Section 4: Real-Time & Scaling (Q61–Q80) – WebSockets, queues, microservices, event-driven design.
+
+Section 5: System Design & Deep Tasks (Q81–Q100) – E-commerce, dashboards, micro-frontends, cloud deployment.
+
+Each question will have:
+✅ Interview-style question
+✅ Answer with explanation
+✅ Practical example code / mini-task
+
+🚀 React + Full-Stack Interview Q&A (100 Scenarios)
+🔹 Section 1: React Core (Q1–Q20)
+Q1. What is JSX in React? Why is it needed?
+
+✅ JSX is syntactic sugar over React.createElement.
+
+const element = <h1>Hello JSX</h1>;
+// Compiles to:
+const element = React.createElement("h1", null, "Hello JSX");
+
+Q2. Explain props vs state with an example.
+function Greeting({ name }: { name: string }) {
+  const [count, setCount] = React.useState(0);
+  return (
+    <div>
+      <h1>Hello {name}, count = {count}</h1>
+      <button onClick={() => setCount(count+1)}>+</button>
+    </div>
+  );
+}
+
+
+name = prop (external, immutable)
+
+count = state (internal, mutable)
+
+Q3. What is useState and how does it work?
+const [count, setCount] = useState(0);
+setCount(count+1);
+
+
+React schedules re-render on state updates.
+
+Q4. Explain useEffect with cleanup.
+useEffect(() => {
+  const id = setInterval(() => console.log("tick"), 1000);
+  return () => clearInterval(id); // cleanup
+}, []);
+
+Q5. What is lifting state up?
+
+👉 Common parent manages shared state.
+
+function Parent() {
+  const [value, setValue] = useState("");
+  return <>
+    <Child1 value={value} onChange={setValue}/>
+    <Child2 value={value}/>
+  </>;
+}
+
+Q6. What is React.Fragment and why use it?
+<>
+  <li>Item1</li>
+  <li>Item2</li>
+</>
+
+Q7. Controlled vs Uncontrolled components (form). ✅ Already explained above.
+Q8. Why are keys important in React lists?
+{items.map(item => <li key={item.id}>{item.text}</li>)}
+
+
+👉 Helps React diff efficiently.
+
+Q9. What is useRef?
+const inputRef = useRef<HTMLInputElement>(null);
+<input ref={inputRef}/>
+
+
+👉 Access DOM node imperatively.
+
+Q10. Explain conditional rendering in React.
+{
+
+You said:
+NoT like that
+ChatGPT said:
+
+Got it 👍 – you don’t want short theory-only answers broken into 100 tiny Q/As.
+You want a big bank of 100 full scenario-based questions → each like Q1–Q5 I gave before, with:
+
+A real-world scenario (not just “what is JSX”)
+
+A deep explanation (how you’d solve it in a project)
+
+A practical example / task / code
+
+So basically:
+✅ Not “basic definitions”
+✅ But hands-on problem → solution → code
+✅ Covering React + Full-Stack (frontend, backend, scaling, cloud, real-time)
+✅ Increasing difficulty (small → medium → deep system design)
+
+⚡ Since writing all 100 in one giant answer will be too long to fit here, I suggest:
+
+I’ll prepare the full structured list of 100 scenarios.
+
+Each section (20 Qs) will be delivered in one chunk (so you can read + practice gradually).
+
+Part 1 (Q1–Q20): React Core & Advanced
+
+Part 2 (Q21–Q40): State Management, Performance, Testing
+
+Part 3 (Q41–Q60): Full-Stack APIs, Auth, DB
+
+Part 4 (Q61–Q80): Real-Time, Scaling, Security
+
+Part 5 (Q81–Q100): System Design & Deep Tasks
+
+That way, you’ll get 100 full scenarios with practical examples step by step, and you won’t lose track.
+
+👉 Before I begin: do you want me to
+
+Start with Part 1 (Q1–Q20 full scenario-based with code) right now,
+or
+
+Give you the full index of all 100 scenarios first, so you can see the roadmap and then we go deep one section at a time?
+
+You said:
+Part 1 (Q1–Q20): React Core & Advanced share all
+ChatGPT said:
+Part 1 — React Core & Advanced (Q1–Q20)
+
+Each item is a real-world scenario, a clear approach/solution, and a practical code example / mini task you can implement. These are written for a 5-year experienced full-stack dev — expect production-minded tradeoffs.
+
+Q1 — Controlled form with complex validation & async uniqueness check
+
+Scenario: Registration form with email, password, username. Username must be unique (API check), password strength validated live, and form should not submit until all validations pass. UX: show inline errors, disable submit while async check pending.
+
+Approach: Use controlled components + useReducer for form state, debounce the username uniqueness check, track isCheckingUsername to disable submit, optimistic UI for password strength
+
+You said:
+Dont writ any examples give me scenarios only 1-20 okay in there each scenations some steps whoch need to perfrom okay do that
+ChatGPT said:
+
+Perfect 👍 you want only scenarios (Q1–Q20), each with steps to perform (no code examples yet).
+Here’s Part 1: React Core & Advanced (Scenarios Only).
+
+🔹 Part 1 — React Core & Advanced (Q1–Q20)
+Q1. Controlled Form Validation
+
+Build a login/registration form.
+
+Ensure all inputs are controlled by React state.
+
+Add validation for required fields.
+
+Show inline error messages.
+
+Disable the submit button until the form is valid.
+
+Q2. Uncontrolled Form with Refs
+
+Create a feedback form using uncontrolled components.
+
+Capture input values using ref.
+
+On submit, show entered values in an alert.
+
+Compare benefits/drawbacks vs controlled forms.
+
+Q3. State Lifting
+
+Two sibling components need the same data (e.g., search input + search results).
+
+Lift state up to a common parent.
+
+Pass data down as props.
+
+Ensure both siblings update in sync.
+
+Q4. Conditional Rendering
+
+Create a component that shows either:
+
+A loading spinner
+
+An error message
+
+Or the actual content
+
+Decide based on props/state.
+
+Q5. useEffect with Cleanup
+
+Build a component that tracks window resize.
+
+Store width/height in state.
+
+Add cleanup to remove the event listener.
+
+Display dimensions on screen.
+
+Q6. Memoization with React.memo
+
+Create a parent with a counter.
+
+Pass a constant prop to a child.
+
+Use React.memo to prevent unnecessary re-renders.
+
+Verify by logging renders.
+
+Q7. useCallback to Optimize Handlers
+
+Parent has multiple children.
+
+Pass callbacks to children.
+
+Without useCallback, children re-render unnecessarily.
+
+Apply useCallback and measure difference.
+
+Q8. useMemo for Expensive Calculations
+
+Implement a search/filter function that processes large data.
+
+Without memoization, it recalculates every render.
+
+Use useMemo to cache results.
+
+Measure performance improvement.
+
+Q9. Context API for Theme Switching
+
+Build a light/dark theme toggle.
+
+Store theme in Context.
+
+Wrap the app in ThemeProvider.
+
+Allow any component to access theme without prop drilling.
+
+Q10. Error Boundaries
+
+Create an error boundary component.
+
+Wrap a child component that throws an error.
+
+Display a fallback UI instead of crashing.
+
+Reset error boundary on user action.
+
+Q11. Keys in Lists
+
+Render a list of items.
+
+Update list by removing an element.
+
+Show what happens with index as key (wrong behavior).
+
+Fix by using a unique id.
+
+Q12. Controlled vs Uncontrolled Input Benchmark
+
+Implement a large form in both styles.
+
+Measure rendering performance.
+
+Compare dev experience vs speed tradeoffs.
+
+Q13. Custom Hook for Local Storage
+
+Create a useLocalStorage hook.
+
+Store theme preference persistently.
+
+Rehydrate state on reload.
+
+Verify state syncs across reloads.
+
+Q14. Portals for Modals
+
+Create a modal dialog that renders outside normal DOM hierarchy.
+
+Implement with React Portal.
+
+Ensure background scroll is locked.
+
+Close modal on outside click.
+
+Q15. Code Splitting with React.lazy
+
+Lazy-load a heavy dashboard component.
+
+Show a fallback loader while loading.
+
+Verify initial bundle size is smaller.
+
+Q16. Suspense with Data Fetching (Mock)
+
+Wrap a component in Suspense.
+
+Simulate a slow API call.
+
+Show a loader while waiting.
+
+Handle fallback UI gracefully.
+
+Q17. useReducer for Complex State
+
+Build a counter with increment, decrement, reset actions.
+
+Extend to a form reducer with multiple fields.
+
+Show how useReducer simplifies state logic.
+
+Q18. useRef for Focus Management
+
+Create a form with multiple fields.
+
+On submit error, auto-focus the first invalid field.
+
+Use ref to manage focus.
+
+Q19. Forwarding Refs
+
+Create a custom Input component.
+
+Allow parent to directly control focus.
+
+Implement ref forwarding.
+
+Demonstrate parent calling .focus().
+
+Q20. Performance Profiling
+
+Build a component with nested children.
+
+Simulate heavy re-renders.
+
+Use React DevTools Profiler to measure render cost.
+
+Apply memoization to fix bottleneck.
+
+👉 These are 20 React Core & Advanced scenarios.
+Each one is step-by-step task-based — ideal for interviews and hands-on practice.
+
+Would you like me to continue with Part 2 (Q21–Q40: State Management, Performance, Testing scenarios) next?
+
+You said:
+Q21–Q100 i want at a time 
+ChatGPT said:
+
+Perfect 👍 Now I’ll give you all the remaining scenarios (Q21–Q100) in one go.
+Each is scenario-style → no code, just steps you’d need to perform, ranging from state management → backend → scaling → deep system design.
+
+🔹 Part 2 — React State Management, Performance, Testing (Q21–Q40)
+Q21. Redux Toolkit for Authentication
+
+Implement Redux slice for login/logout.
+
+Store access token + user profile.
+
+Setup persistence in localStorage.
+
+Securely clear state on logout.
+
+Q22. React Query for API Caching
+
+Fetch posts with pagination.
+
+Cache responses for instant navigation.
+
+Enable background refetching.
+
+Show stale-while-revalidate behavior.
+
+Q23. Zustand for Lightweight State
+
+Replace Redux with Zustand for small global state.
+
+Implement a cart system.
+
+Expose selectors for performance optimization.
+
+Q24. Optimistic UI Updates
+
+Build a “like” button for posts.
+
+Update UI instantly (optimistic).
+
+Rollback if API call fails.
+
+Q25. Infinite Scroll with React Query
+
+Fetch paginated feed data.
+
+Implement infinite scrolling (load more).
+
+Merge new pages into existing cache.
+
+Q26. Debouncing API Search
+
+Search box calls API on input.
+
+Debounce to avoid excessive calls.
+
+Show loading spinner only when request in progress.
+
+Q27. Suspense with Concurrent Mode
+
+Wrap async data fetch in Suspense.
+
+Show placeholder skeleton loader.
+
+Replace with data once available.
+
+Q28. Redux Middleware for Logging
+
+Add middleware to log every dispatched action.
+
+Show before/after state in console.
+
+Extend to error reporting service.
+
+Q29. Performance Optimization with Virtualized List
+
+Render 10,000 items in a list.
+
+Replace with react-window/react-virtuoso.
+
+Confirm memory/CPU improvement.
+
+Q30. Bundle Size Analysis
+
+Build app with Webpack/Vite.
+
+Analyze bundle size.
+
+Identify large dependencies.
+
+Apply code splitting & tree shaking.
+
+Q31. Jest Unit Testing
+
+Write unit tests for a counter component.
+
+Test increment/decrement functionality.
+
+Add snapshot test for rendering.
+
+Q32. React Testing Library (RTL)
+
+Test a form submission.
+
+Fill fields programmatically.
+
+Assert that success message appears.
+
+Q33. Cypress E2E Testing
+
+Automate login flow.
+
+Enter credentials, click login.
+
+Assert that dashboard loads.
+
+Q34. Mocking API Calls in Tests
+
+Use MSW (Mock Service Worker).
+
+Mock /api/posts response.
+
+Verify UI renders mocked posts.
+
+Q35. Error Boundary Testing
+
+Simulate component throwing error.
+
+Assert that fallback UI is shown.
+
+Test reset behavior.
+
+Q36. Accessibility Testing
+
+Use axe testing library.
+
+Scan component for accessibility violations.
+
+Fix issues (labels, ARIA).
+
+Q37. Snapshot Testing with Dynamic Props
+
+Render component with multiple props.
+
+Save snapshots.
+
+Verify changes are intentional.
+
+Q38. Redux Thunk Testing
+
+Test async login action.
+
+Mock API call.
+
+Verify state changes correctly.
+
+Q39. Performance Testing with React Profiler
+
+Record render times.
+
+Identify unnecessary re-renders.
+
+Optimize with memoization/hooks.
+
+Q40. CI/CD Testing Pipeline
+
+Setup GitHub Actions for React app.
+
+Run lint + test on every PR.
+
+Block merge on test failure.
+
+🔹 Part 3 — Full-Stack API, Auth, Database (Q41–Q60)
+Q41. REST API Integration
+
+Connect React frontend to Node/Express backend.
+
+Fetch product list.
+
+Handle loading/error states.
+
+Q42. Authentication with JWT
+
+Secure login endpoint.
+
+Issue access/refresh tokens.
+
+Store tokens securely in HttpOnly cookie.
+
+Auto-refresh on expiry.
+
+Q43. Role-Based Access Control (RBAC)
+
+Define roles: user, admin.
+
+Restrict access to admin pages.
+
+Hide UI actions if unauthorized.
+
+Q44. File Uploads to Backend
+
+Implement file input.
+
+Send via FormData.
+
+Store on server.
+
+Show upload progress bar.
+
+Q45. Large File Upload with Chunking
+
+Split file into chunks.
+
+Upload sequentially.
+
+Merge chunks on backend.
+
+Resume if interrupted.
+
+Q46. Image Optimization
+
+Upload images to S3.
+
+Generate multiple sizes.
+
+Use CDN to deliver.
+
+Implement lazy loading.
+
+Q47. GraphQL Integration
+
+Setup Apollo Client.
+
+Query posts with nested comments.
+
+Use caching for efficiency.
+
+Q48. GraphQL Mutations with Optimistic Updates
+
+Submit comment mutation.
+
+Show comment immediately.
+
+Rollback if mutation fails.
+
+Q49. Database Integration (MongoDB)
+
+Setup Express + Mongo backend.
+
+Store user profiles.
+
+Fetch from React frontend.
+
+Q50. Database Integration (PostgreSQL)
+
+Use Prisma/TypeORM ORM.
+
+Create product + order tables.
+
+Query with filtering + sorting.
+
+Q51. Pagination on Backend + Frontend
+
+Implement limit/offset API.
+
+Fetch in React with “load more” button.
+
+Display in paginated table.
+
+Q52. Sorting & Filtering
+
+Add backend query params.
+
+Update UI dropdown filters.
+
+Combine with pagination.
+
+Q53. Secure Password Storage
+
+Hash with bcrypt on backend.
+
+Validate on login.
+
+Never expose plain passwords.
+
+Q54. API Rate Limiting
+
+Apply middleware (rate limiter).
+
+Prevent abuse (too many requests).
+
+Show error in React if limit reached.
+
+Q55. Caching API Responses
+
+Use Redis on backend.
+
+Cache expensive queries.
+
+Invalidate cache on data change.
+
+Q56. Webhook Handling
+
+Setup backend to receive webhooks (Stripe/PayPal).
+
+Update order status.
+
+Show confirmation in React.
+
+Q57. Environment-Specific Config
+
+Setup .env for dev/staging/prod.
+
+Read API base URL dynamically.
+
+Inject variables into React build.
+
+Q58. Error Handling Middleware
+
+Centralize error handler in backend.
+
+Send structured JSON error responses.
+
+Show friendly error in frontend.
+
+Q59. Logging & Monitoring
+
+Add Winston logger in backend.
+
+Track API requests + errors.
+
+Integrate with React error boundary.
+
+Q60. Secure API with CORS
+
+Setup CORS policy (specific origins only).
+
+Block unauthorized domains.
+
+Test React requests with allowed origin.
+
+🔹 Part 4 — Real-Time, Scaling, Security (Q61–Q80)
+Q61. WebSockets Chat App
+
+Setup Socket.IO server.
+
+Connect React client.
+
+Send/receive chat messages in real-time.
+
+Q62. Real-Time Notifications
+
+Push notification from backend on new order.
+
+Show toast in React client.
+
+Store notifications in Redux.
+
+Q63. Live Dashboard with WebSockets
+
+Stream live sales data.
+
+Update charts in React.
+
+Disconnect/cleanup on unmount.
+
+Q64. Presence Detection
+
+Track online users via WebSocket.
+
+Update user list in React.
+
+Handle disconnect events.
+
+Q65. Optimistic WebSocket Updates
+
+Update UI before server acknowledgment.
+
+Rollback if server rejects event.
+
+Q66. Pub/Sub Architecture
+
+Backend publishes events to Redis/Kafka.
+
+WebSocket server pushes to React client.
+
+Scale across multiple servers.
+
+Q67. Real-Time Typing Indicator
+
+Send typing events in chat.
+
+Show “User is typing…” in React.
+
+Remove when stopped.
+
+Q68. Security: CSRF Protection
+
+Use CSRF tokens in forms.
+
+Verify token on backend.
+
+Store token securely in React.
+
+Q69. Security: XSS Protection
+
+Sanitize input in backend.
+
+Escape output in React.
+
+Test with malicious script injection.
+
+Q70. Security: JWT Expiration Handling
+
+Handle expired tokens gracefully.
+
+Refresh token automatically.
+
+Redirect to login on failure.
+
+Q71. Security: Content Security Policy (CSP)
+
+Add CSP headers on backend.
+
+Restrict script sources.
+
+Verify React app still functions.
+
+Q72. DDoS Protection
+
+Add backend rate limiter.
+
+Use CDN with WAF.
+
+Test API resilience.
+
+Q73. GDPR Compliance
+
+Add cookie consent banner.
+
+Provide data export/delete options.
+
+Update privacy policy.
+
+Q74. Multi-Tenancy Support
+
+Separate data by tenant (org id).
+
+Pass tenant id in JWT.
+
+Restrict queries by tenant.
+
+Q75. Feature Flags
+
+Enable/disable features per user.
+
+Store flags in backend DB.
+
+Load flags in React app.
+
+Q76. Rate-Limited API Retry
+
+On 429 Too Many Requests, back off.
+
+Retry with exponential delay.
+
+Show retry countdown in UI.
+
+Q77. Web Workers for Heavy Tasks
+
+Offload image processing to worker.
+
+Communicate results to React.
+
+Keep UI responsive.
+
+Q78. Service Workers for Offline Mode
+
+Cache static assets.
+
+Serve offline page.
+
+Sync data when back online.
+
+Q79. Progressive Web App (PWA)
+
+Add manifest.json.
+
+Enable install to home screen.
+
+Test offline mode.
+
+Q80. GraphQL Subscriptions
+
+Setup subscription server.
+
+Subscribe to live comment updates.
+
+Render updates in React.
+
+🔹 Part 5 — System Design & Deep Tasks (Q81–Q100)
+Q81. E-commerce Cart System
+
+Design product catalog API.
+
+Implement cart in React state.
+
+Persist cart in DB.
+
+Q82. Checkout Flow with Payments
+
+Integrate Stripe/PayPal.
+
+Secure backend webhook handling.
+
+Show order status in React.
+
+Q83. Multi-Step Form Wizard
+
+Create 5-step checkout form.
+
+Persist progress in local storage.
+
+Allow resume later.
+
+Q84. Admin Dashboard with Role Control
+
+Show different menus for admins/users.
+
+Implement CRUD for products.
+
+Add analytics charts.
+
+Q85. Micro-Frontend Architecture
+
+Split React app into micro-frontends.
+
+Use Module Federation.
+
+Share auth state across apps.
+
+Q86. SSR with Next.js
+
+Server-render product detail pages.
+
+Improve SEO for search engines.
+
+Cache server responses.
+
+Q87. Static Site Generation
+
+Pre-build blog pages from Markdown.
+
+Deploy via CDN.
+
+Add rebuild trigger on new post.
+
+Q88. BFF (Backend for Frontend)
+
+Build BFF layer for React.
+
+Aggregate multiple microservice APIs.
+
+Simplify client consumption.
+
+Q89. CI/CD Deployment Pipeline
+
+Build React app in GitHub Actions.
+
+Run tests.
+
+Deploy to AWS/GCP/Azure.
+
+Q90. Kubernetes Deployment
+
+Containerize React + Node app.
+
+Deploy to Kubernetes cluster.
+
+Enable autoscaling.
+
+Q91. Logging & Monitoring in Production
+
+Add structured logging.
+
+Setup Prometheus/Grafana dashboards.
+
+Monitor React errors via Sentry.
+
+Q92. Caching Strategy at Scale
+
+Cache static assets in CDN.
+
+Cache API responses in Redis.
+
+Invalidate cache on data change.
+
+Q93. Multi-Language Support (i18n)
+
+Add translation library.
+
+Load language bundles dynamically.
+
+Switch language from dropdown.
+
+Q94. Serverless Architecture
+
+Deploy APIs as AWS Lambda.
+
+Connect React to API Gateway.
+
+Optimize cold starts.
+
+Q95. Edge Computing with Cloudflare Workers
+
+Render HTML at edge.
+
+Reduce latency for global users.
+
+Cache React SSR output.
+
+Q96. Real-Time Analytics Dashboard
+
+Collect live metrics (page views, sales).
+
+Push via WebSocket.
+
+Render charts in React.
+
+Q97. AI Integration in React
+
+Call AI API (OpenAI, etc.).
+
+Show smart recommendations.
+
+Cache results for performance.
+
+Q98. Blockchain Wallet Integration
+
+Connect MetaMask to React app.
+
+Fetch wallet balance.
+
+Sign transactions.
+
+Q99. Face Verification Flow
+
+Capture webcam input.
+
+Send to backend ML model.
+
+Show verification result in React.
+
+Q100. Full System Design: Gaming Marketplace
+
+Build React frontend (browse, buy, manage games).
+
+Node/Express backend with GraphQL.
+
+Store purchases in DB.
+
+Add AI-based sales prediction.
+
+Integrate blockchain for transparent transactions.
+
+Deploy with CI/CD pipeline.
+
+✅ That’s Q1–Q100: 100 practical React + Full-Stack scenarios, from simple to deep system design.
+
+Would you like me to now expand each of Q21–Q100 with code + detailed steps (like I did earlier for Q1–Q5) in smaller chunks (e.g., 20 at a time), so you can practice them hands-on?
