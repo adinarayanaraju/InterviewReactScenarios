@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ApolloProvider } from '@apollo/client';
+import { client as apolloClient } from './apollo-client';
 import { store } from './store';
 import './index.css';
 import App from './App';
@@ -21,18 +23,20 @@ async function enableMocking() {
 }
 
 
-// Create a client
+// Create a client for React Query
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 enableMocking().then(() => {
   root.render(
     <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </QueryClientProvider>
+      <ApolloProvider client={apolloClient}>
+        <QueryClientProvider client={queryClient}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </QueryClientProvider>
+      </ApolloProvider>
     </React.StrictMode>
   );
 });
